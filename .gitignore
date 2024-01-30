@@ -1,0 +1,9 @@
+
+node_modules
+
+# 重要文件忽略
+personal.js
+
+allProjects.json
+
+
