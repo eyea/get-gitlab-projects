@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "lint": "eslint src",
-    "get:all": "node src/index.js"
+    "get": "node src/index.js",
+    "download": "node src/download.js",
+    "checkLintType": "node src/checkLintType.js",
+    "run:all": "node src/index.js && node src/download.js && node src/checkLintType.js"
   },
   "author": "eyea <deyesea@gmail.com>",
   "license": "ISC",
