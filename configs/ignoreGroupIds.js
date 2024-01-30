@@ -1,6 +1,10 @@
 // rootGroup 下的忽略组id
 const ignoreGroupIds = [
-  81670403, // 示例中的 subgroup-3-ignore
+  4599,
+  4671,
+  4959,
+  4998,
+  5215,
 ];
 
  export default ignoreGroupIds;
