@@ -147,7 +147,7 @@ async function getProjectsByIds(ids) {
     );
 
     console.log(
-      `共统计有 ${filteredResult.length} 个项目，结果已导出到 allProjects.json \n`
+      `当前使用的token是 ${accessToken}\n\n共统计有 ${filteredResult.length} 个项目，结果已导出到 allProjects.json \n`
     );
   } catch (error) {
     console.error("Error occurred:", error.message);
