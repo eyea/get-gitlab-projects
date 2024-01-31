@@ -24,7 +24,7 @@ function findFilePath(startPath, name = "package.json") {
 
   // Check if client and server directories exist
   const clientPath = path.join(startPath, "client");
-  const serverPath = path.join(startPath, "server");
+  // const serverPath = path.join(startPath, "server");
 
   if (fs.existsSync(clientPath)) {
     const packageJsonPathInClient = findFilePath(clientPath, name);
@@ -33,12 +33,13 @@ function findFilePath(startPath, name = "package.json") {
     }
   }
 
-  if (fs.existsSync(serverPath)) {
-    const packageJsonPathInServer = findFilePath(serverPath, name);
-    if (packageJsonPathInServer) {
-      return packageJsonPathInServer;
-    }
-  }
+  // 只计算 client的  server过滤
+  // if (fs.existsSync(serverPath)) {
+  //   const packageJsonPathInServer = findFilePath(serverPath, name);
+  //   if (packageJsonPathInServer) {
+  //     return packageJsonPathInServer;
+  //   }
+  // }
 
   const files = fs.readdirSync(startPath);
   if (files) {
@@ -74,7 +75,7 @@ function detectProjectType(directoryPath) {
 
     // 检查 package.json 文件中的依赖
     if(packageJson.dependencies) {
-      if (packageJson.dependencies.react || packageJson.dependencies['react-native-webview']) {
+      if (packageJson.dependencies.react || packageJson.dependencies.preact || packageJson.dependencies['react-native-webview'] || packageJson.dependencies.umi || packageJson.dependencies['@umijs/max']) {
         lastType = 'react-' + lastType;
       } else if (packageJson.dependencies['vue']) {
           if (packageJson.dependencies['vue'].startsWith('^3.')) {
@@ -86,7 +87,7 @@ function detectProjectType(directoryPath) {
     }
 
     if(packageJson.devDependencies) {
-      if (packageJson.devDependencies.react || packageJson.devDependencies['react-native-webview']) {
+      if (packageJson.devDependencies.react || packageJson.devDependencies.preact || packageJson.devDependencies['react-native-webview']  || packageJson.devDependencies.umi || packageJson.devDependencies['@umijs/max']) {
         lastType = 'react-' + lastType;
       } else if (packageJson.devDependencies['vue']) {
           if (packageJson.devDependencies['vue'].startsWith('^3.')) {
@@ -104,7 +105,8 @@ function detectProjectType(directoryPath) {
       "package.json not found in the specified directory.",
       directoryPath
     );
-    return lastType;
+    // return lastType;
+    return null;
   }
 }
 
@@ -115,14 +117,21 @@ function updateProjectLint(repositories) {
 
     const repositoryPath = path.join(
       __dirname,
-      '../../../afu/afu-all-projects-demo/',
+      '../../../afu/afu-all-projects/',
       name
     );
 
     if (fs.existsSync(repositoryPath)) {
       const type = detectProjectType(repositoryPath);
-      console.log(name, type);
+      const rootHasPnpmWorkSpace = fs.existsSync(path.join(repositoryPath, 'pnpm-workspace.yaml'));
+      const rootHasPkg = fs.existsSync(path.join(repositoryPath, 'package.json'))
+      const rootHasSrc = fs.existsSync(path.join(repositoryPath, 'src'))
+      const rootHasPkgAndSrc = rootHasPkg && rootHasSrc;
       repositoryInfo.AFULintType = type;
+      repositoryInfo.rootHasPnpmWorkSpace = rootHasPnpmWorkSpace;
+      repositoryInfo.rootHasPkg = rootHasPkg;
+      repositoryInfo.rootHasSrc = rootHasSrc;
+      repositoryInfo.rootHasPkgAndSrc = rootHasPkgAndSrc;
       result.push(repositoryInfo);
     }
 
@@ -143,6 +152,8 @@ async function checkLintType() {
   );
 
   console.log('allProjects.json 已经添加AFULintType字段 用于lint规则使用依据 \n');
+  // console.table(getTypeAllProjects.filter(v => !v.rootHasPkg).map(({ name, AFULintType, rootHasPkg, rootHasPnpmWorkSpace, rootHasSrc, rootHasPkgAndSrc, web_url, description }) => ({ name, AFULintType, rootHasPkg, rootHasPnpmWorkSpace, rootHasSrc, rootHasPkgAndSrc, web_url, description })))
+  console.table(getTypeAllProjects.map(({ name, AFULintType, rootHasPkg, rootHasPnpmWorkSpace, rootHasSrc, rootHasPkgAndSrc, web_url }) => ({ name, AFULintType, rootHasPkg, rootHasPnpmWorkSpace, rootHasSrc, rootHasPkgAndSrc, web_url })))
 
 }
 

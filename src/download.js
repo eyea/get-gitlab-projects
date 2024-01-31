@@ -20,7 +20,7 @@ function downReopFromGit(repositories) {
 
     const repositoryPath = path.join(
       __dirname,
-      '../../../afu/afu-all-projects-demo/',
+      '../../../afu/afu-all-projects/',
       name
     );
 
