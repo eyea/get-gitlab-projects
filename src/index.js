@@ -121,6 +121,7 @@ async function getProjectsByIds(ids) {
 
 (async () => {
   try {
+
     // 获取所有子 Group 下的 Projects
     const rootGroupIdProjectsInfos = await getAllSubGroupProjects(rootGroupId);
 
