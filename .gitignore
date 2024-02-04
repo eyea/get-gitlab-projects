@@ -7,4 +7,5 @@ personal.js
 allProjects.json
 allProjectsWithLinType.json
 allProjectsLintResult.json
+allProjectsLintResultDetail.json
 

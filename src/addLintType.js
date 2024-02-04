@@ -144,6 +144,43 @@ function readPackageJson(directoryPath) {
   return pkg_type;
 }
 
+// 给定起始路径，递归找到是否还有某个后缀的类型存在
+function findDeepHasSomeTypeFile(startPath, suffix = '') {
+  if(!suffix) {
+    return false
+  }
+
+  const files = fs.readdirSync(startPath);
+
+  if (files) {
+    for (const file of files) {
+      if (!file) {return null;}
+      const filePath = path.join(startPath, file);
+      if (!filePath || filePath.includes("/node_modules/")) {return null;}
+
+      // 使用 fs.statSync 获取路径的状态信息
+      try {
+        const stats = fs.statSync(filePath);
+        // 使用 isFile 方法来判断该路径是否为文件
+        if (stats.isFile()) {
+          // 获取并输出文件的扩展名
+          const fileExtension = path.extname(filePath);
+          if(fileExtension === suffix) {
+            return true
+          }
+        }
+        if (stats.isDirectory()) {
+          return findDeepHasSomeTypeFile(filePath, suffix)
+        }
+      } catch (error) {
+        // 如果出现错误（例如文件不存在），将捕获到这里
+        return false
+      }
+
+    }
+  }
+}
+
 // 返回所在路径下的 linttype  (vue2/vue3/react + ts/js)
 function getLintTypeByPath(directoryPath) {
   let final_lint_type = 'js'
@@ -152,6 +189,11 @@ function getLintTypeByPath(directoryPath) {
 
   const tsconfigFilePath = findFilePath(directoryPath, "tsconfig.json");
   final_lint_type = fs.existsSync(tsconfigFilePath) ? (pkg_type + 'ts'): (pkg_type + 'js')
+
+  // 还有一种， 直接写ts的，并没有用lint，此时使用js就会报错
+  const curChildHasTSTypeFile = findDeepHasSomeTypeFile(directoryPath, '.ts')
+
+  final_lint_type = curChildHasTSTypeFile ? 'ts' : final_lint_type
 
   return final_lint_type
 
@@ -171,7 +213,8 @@ function detectProjectType(directoryPath, rootName) {
 
   // uniapp 的项目这个 可以细分下
   if(IsUniAppType) {
-    typeList.root = 'vue2-ts'
+    const jsorts = getLintTypeByPath(directoryPath)
+    typeList.root_uniappp = 'vue2-' + jsorts
     return typeList
   }
 
@@ -231,7 +274,7 @@ function detectProjectType(directoryPath, rootName) {
               file
             }; // 如果找到了 package.json 文件，则返回该路径
           } else {
-            findDeepPkgPath(filePath, 'package.json')
+            findDeepPkgPath(filePath, name)
           }
         }
       }

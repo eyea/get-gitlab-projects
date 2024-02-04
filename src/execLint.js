@@ -18,19 +18,18 @@ async function loadFileList() {
 
 // 执行具体的lint 返回结果
 function runLint(lintType, lintPath) {
-  let lintresult = {
-    errors: 0,
-    warnings: 0,
-  };
+  let lintresult = {};
 
   // 检查path是否存在
   if (!fs.existsSync(lintPath)) {
     return lintresult;
   }
 
+  // 增加缓冲区大小到10MB
+// const options = { stdio: 'inherit', maxBuffer: 1024 * 1024 * 10 };
   const res = execSync(
     `npx @afuteam/eslint-plugin-fe@latest --type=${lintType} --path=${lintPath}`,
-    { encoding: "utf8" }
+    { encoding: "utf8", maxBuffer: 1024 * 1024 * 10 }
   );
   const errorsMatch = res.match(/Total errors:\s*(\d+)/);
   const warningsMatch = res.match(/Total warnings:\s*(\d+)/);
@@ -115,21 +114,45 @@ function lintProject(project) {
     name
   );
 
-  // 标准的 根目录有 package.json 和 src的项目，只有root一个值
+  // 标准的 根目录有 package.json
   if (AFULintTypeKeys.length === 1 && AFULintTypeKeys.includes("root")) {
-    const lintRelativePath = repositoryPath + "/src";
+    let lintRelativePath = repositoryPath + "/src";
+
+    if(!fs.existsSync(lintRelativePath)) {
+      lintRelativePath = repositoryPath + "/";
+    }
+
     const res = runLint(AFULintType.root, lintRelativePath);
     alllintresult[name] = res;
+
+    return alllintresult;
   }
 
-  function lastCeng(keys, curType, curRepoName, curPath) {
+  // 根目录 package.josn， 是 uniapp的
+  if (AFULintTypeKeys.length === 1 && AFULintTypeKeys.includes("root_uniappp")) {
+    const lintRelativePath = repositoryPath + "/";
+    const res = runLint(AFULintType.root_uniappp, lintRelativePath);
+    alllintresult[name] = res;
+
+    return alllintresult;
+
+  }
+
+  function handleCommonFileStruc(keys, curType, curRepoName, curPath) {
     keys.forEach((key) => {
-      let lintRelativePath = curPath + `/${key}`;
-      const lintRelativePathSrc = lintRelativePath + '/src'
+
+      let lintRelativePath = curPath;
+      let lintRelativePathKey = curPath + `/${key}`;
+      const lintRelativePathSrc = lintRelativePathKey + '/src'
 
       // src目录，有就用，没有就不用
       if(fs.existsSync(lintRelativePathSrc)) {
         lintRelativePath = lintRelativePathSrc
+      }
+
+      // 如果key的目录存在，就用，不存在就当前路径计算
+      if(fs.existsSync(lintRelativePathKey)) {
+        lintRelativePath = lintRelativePathKey
       }
 
       const curTypeKey = curType[key];
@@ -140,7 +163,7 @@ function lintProject(project) {
       }
 
       if (typeof curTypeKey === "object") {
-        lastCeng(
+        handleCommonFileStruc(
           Object.keys(curTypeKey),
           curTypeKey,
           curRepoName,
@@ -151,7 +174,7 @@ function lintProject(project) {
   }
 
   if (AFULintTypeKeys.length > 0) {
-    lastCeng(AFULintTypeKeys, AFULintType, name, repositoryPath);
+    handleCommonFileStruc(AFULintTypeKeys, AFULintType, name, repositoryPath);
   }
 
   return alllintresult;
@@ -178,6 +201,13 @@ async function lintAllProject() {
     // 计算所有的结果
     if (allData && allData.length > 0) {
       console.log("开始计算最终结果...\n");
+
+      fs.writeFileSync(
+        "allProjectsLintResultDetail.json",
+        JSON.stringify(allData, null, 2)
+      );
+    console.log(`计算最终结果完毕, 结果输出在 allProjectsLintResultDetail.json \n`);
+
       const finalData = summarizeErrorsAndWarnings(allData);
 
       fs.writeFileSync(
