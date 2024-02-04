@@ -8,6 +8,7 @@ import YAML from 'yamljs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import BlackFileList from '../configs/BlackFileList.js'
+import Tools from "./utils/index.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -366,6 +367,7 @@ function updateProjectLint(repositories) {
 
 }
 
+
 async function checkLintType() {
   const allProjects = await loadFileList();
 
@@ -373,10 +375,8 @@ async function checkLintType() {
 
   const getTypeAllProjects = updateProjectLint(allProjects)
 
-  fs.writeFileSync(
-    "allProjectsWithLinType.json",
-    JSON.stringify(getTypeAllProjects, null, 2)
-  );
+  // 指定目录写入结果文件
+  Tools.writeRes2SomePath('allProjectsWithLinType.json', getTypeAllProjects)
 
   console.log(`allProjectsWithLinType.json 已经添加AFULintType字段 用于lint规则使用依据, 共 ${getTypeAllProjects.length} 条 \n`);
 

@@ -1,5 +1,6 @@
 
 node_modules
+plist
 
 # 重要文件忽略
 personal.js

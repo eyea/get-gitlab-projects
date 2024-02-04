@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { execSync } from "child_process";
+import Tools from "./utils/index.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -202,18 +203,15 @@ async function lintAllProject() {
     if (allData && allData.length > 0) {
       console.log("开始计算最终结果...\n");
 
-      fs.writeFileSync(
-        "allProjectsLintResultDetail.json",
-        JSON.stringify(allData, null, 2)
-      );
-    console.log(`计算最终结果完毕, 结果输出在 allProjectsLintResultDetail.json \n`);
+       // 指定目录写入结果文件
+      Tools.writeRes2SomePath('allProjectsLintResultDetail.json', allData)
+
+      console.log(`计算最终结果完毕, 结果输出在 allProjectsLintResultDetail.json \n`);
 
       const finalData = summarizeErrorsAndWarnings(allData);
 
-      fs.writeFileSync(
-        "allProjectsLintResult.json",
-        JSON.stringify(finalData, null, 2)
-      );
+      // 指定目录写入结果文件
+      Tools.writeRes2SomePath('allProjectsLintResult.json', finalData)
 
       console.log(`计算最终结果完毕, 结果输出在 allProjectsLintResult.json \n`);
     }

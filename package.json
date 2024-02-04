@@ -5,13 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "test": "node src/test.js",
     "lint": "eslint src",
     "getall": "node src/index.js",
     "download": "node src/download.js",
     "addlinttype": "node src/addLintType.js",
     "execlint": "node src/execLint.js",
     "table": "node src/table.js",
-    "run:all": "node src/index.js && node src/download.js && node src/addLintType.js && node src/execLint.js && node src/table.js"
+    "all": "node src/index.js && node src/download.js && node src/addLintType.js && node src/execLint.js"
   },
   "author": "eyea <deyesea@gmail.com>",
   "license": "ISC",
