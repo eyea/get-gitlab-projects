@@ -17,7 +17,7 @@
   "author": "eyea <deyesea@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "@afuteam/eslint-plugin-fe": "^2.0.4",
+    "@afuteam/eslint-plugin-fe": "2.0.5-beta.3",
     "eslint": "^8.56.0",
     "node-fetch": "^3.3.2",
     "yamljs": "^0.3.0"

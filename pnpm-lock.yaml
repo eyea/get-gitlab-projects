@@ -6,8 +6,8 @@ settings:
 
 devDependencies:
   '@afuteam/eslint-plugin-fe':
-    specifier: ^2.0.4
-    version: 2.0.4(@babel/plugin-syntax-flow@7.23.3)(@babel/plugin-transform-react-jsx@7.23.4)(eslint@8.56.0)(typescript@5.3.3)
+    specifier: 2.0.5-beta.3
+    version: 2.0.5-beta.3(@babel/plugin-syntax-flow@7.23.3)(@babel/plugin-transform-react-jsx@7.23.4)(eslint@8.56.0)(typescript@5.3.3)
   eslint:
     specifier: ^8.56.0
     version: 8.56.0
@@ -25,8 +25,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /@afuteam/eslint-plugin-fe@2.0.4(@babel/plugin-syntax-flow@7.23.3)(@babel/plugin-transform-react-jsx@7.23.4)(eslint@8.56.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-bH9EC+Foc4SJ9kfP4ZbE+IzYYU1V/PRSMg3SXuvz6mQ/24xUZAMjZF8EC2zYYDzQ7B8x7uFM8DHUhbbzI8NRFg==}
+  /@afuteam/eslint-plugin-fe@2.0.5-beta.3(@babel/plugin-syntax-flow@7.23.3)(@babel/plugin-transform-react-jsx@7.23.4)(eslint@8.56.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-xQKYf9borGbXqzQiLMJn1/yfrOWpvLVZjlKWJUecSSNM1oSNZilZxgZ9fS+bdmwqen7l3chXku7AIYb+dBpFEw==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     hasBin: true
     peerDependencies:

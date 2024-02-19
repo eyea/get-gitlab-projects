@@ -47,7 +47,7 @@ function readPackageJson(directoryPath) {
 
 
 // AFULintType 字段返回多级
-function detectProjectType(directoryPath, name) {
+function detectProjectType(directoryPath) {
   const rootHasPkg = fs.existsSync(path.join(directoryPath, 'package.json'))
 
   if (rootHasPkg) {
