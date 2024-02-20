@@ -344,7 +344,7 @@ function updateProjectLint(repositories) {
   const result = []
 
   for (const repositoryInfo of repositories) {
-    const { name, web_url } = repositoryInfo;
+    const { id, created_at, last_activity_at, name, web_url } = repositoryInfo;
 
     const repositoryPath = path.join(
       __dirname,
@@ -355,6 +355,9 @@ function updateProjectLint(repositories) {
     if (fs.existsSync(repositoryPath)) {
       const AFULintType = detectProjectType(repositoryPath, name)
       result.push({
+        id,
+        created_at,
+        last_activity_at,
         name,
         AFULintType,
         web_url
@@ -376,6 +379,11 @@ async function checkLintType() {
   const getTypeAllProjects = updateProjectLint(allProjects)
 
   // 指定目录写入结果文件
+  fs.writeFileSync(
+    "allProjectsWithLinType.json",
+    JSON.stringify(getTypeAllProjects, null, 2)
+  );
+
   Tools.writeRes2SomePath('allProjectsWithLinType.json', getTypeAllProjects)
 
   console.log(`allProjectsWithLinType.json 已经添加AFULintType字段 用于lint规则使用依据, 共 ${getTypeAllProjects.length} 条 \n`);

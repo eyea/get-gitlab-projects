@@ -77,7 +77,7 @@ function updateProjectLint(repositories) {
     );
 
     if (fs.existsSync(repositoryPath)) {
-      const hasReleaseCmd = detectProjectType(repositoryPath, name)
+      const hasReleaseCmd = detectProjectType(repositoryPath)
       result.push({
         name,
         hasReleaseCmd,

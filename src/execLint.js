@@ -32,21 +32,30 @@ function runLint(lintType, lintPath) {
     `npx @afuteam/eslint-plugin-fe@latest --type=${lintType} --path=${lintPath}`,
     { encoding: "utf8", maxBuffer: 1024 * 1024 * 10 }
   );
+  console.log(res);
   const errorsMatch = res.match(/Total errors:\s*(\d+)/);
   const warningsMatch = res.match(/Total warnings:\s*(\d+)/);
+  const totalBlankLines = res.match(/Total totalBlankLines:\s*(\d+)/) || 0;
+  const totalCommentLines = res.match(/Total totalCommentLines:\s*(\d+)/) || 0;
+  const totalCodeLines = res.match(/Total totalCodeLines:\s*(\d+)/) || 0;
 
   if (errorsMatch && warningsMatch) {
     lintresult = {
       errors: +errorsMatch[1],
       warnings: +warningsMatch[1],
+      total: +errorsMatch[1] + +warningsMatch[1],
+      blankLines: +totalBlankLines[1],
+      commentLines: +totalCommentLines[1],
+      codeLines: +totalCodeLines[1],
     };
   }
+
   return lintresult;
 }
 
 // 项目维度累计数据之和
 function summarizeErrorsAndWarnings(array) {
-  console.log(88888888, "\n", JSON.stringify(array, null, 2));
+
   return array.map((item) => {
     // 获取第一个键名作为工具集名称
     const toolsetName = Object.keys(item)[0];
@@ -54,6 +63,9 @@ function summarizeErrorsAndWarnings(array) {
     // 初始化错误和警告总数
     let totalErrors = 0;
     let totalWarnings = 0;
+    let totalBlankLines = 0;
+    let totalCommentLines = 0;
+    let totalCodeLines = 0;
 
     // 递归函数，累加 errors 和 warnings
     function accumulateErrorsAndWarnings(info) {
@@ -72,6 +84,15 @@ function summarizeErrorsAndWarnings(array) {
               if (key === "warnings") {
                 totalWarnings += value1[key];
               }
+              if (key === "blankLines") {
+                totalBlankLines += value1[key];
+              }
+              if (key === "commentLines") {
+                totalCommentLines += value1[key];
+              }
+              if (key === "codeLines") {
+                totalCodeLines += value1[key];
+              }
               // 递归调用
               accumulateErrorsAndWarnings(value1[key]);
             });
@@ -81,6 +102,16 @@ function summarizeErrorsAndWarnings(array) {
             }
             if (obj === "warnings") {
               totalWarnings += info[obj];
+            }
+
+            if (obj === "blankLines") {
+              totalBlankLines += info[obj];
+            }
+            if (obj === "commentLines") {
+              totalCommentLines += info[obj];
+            }
+            if (obj === "codeLines") {
+              totalCodeLines += info[obj];
             }
           }
         });
@@ -95,8 +126,16 @@ function summarizeErrorsAndWarnings(array) {
       [toolsetName]: {
         errors: totalErrors,
         warnings: totalWarnings,
+        total: totalErrors + totalWarnings,
+        blankLines: totalBlankLines,
+        commentLines: totalCommentLines,
+        codeLines: totalCodeLines,
+        created_at: item.created_at || '',
+        last_activity_at: item.last_activity_at || '',
+        id: item.id || ''
       },
     };
+
     return summary;
   });
 }
@@ -190,7 +229,14 @@ async function lintAllProject() {
     const allData = [];
 
     allProjects.forEach((project, index) => {
-      const projectLintData = lintProject(project);
+      let projectLintData = lintProject(project);
+      const { id, created_at, last_activity_at, name, web_url } = project;
+
+      projectLintData = {
+        ...projectLintData,
+        id, created_at, last_activity_at, name, web_url
+      }
+
       console.log(
         `已完成 ${index + 1}/${allProjects.length} : ${
           project.name
@@ -211,6 +257,11 @@ async function lintAllProject() {
       const finalData = summarizeErrorsAndWarnings(allData);
 
       // 指定目录写入结果文件
+      fs.writeFileSync(
+        "allProjectsLintResult.json",
+        JSON.stringify(finalData, null, 2)
+      );
+
       Tools.writeRes2SomePath('allProjectsLintResult.json', finalData)
 
       console.log(`计算最终结果完毕, 结果输出在 allProjectsLintResult.json \n`);

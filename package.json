@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node src/test.js",
+    "test": "node src/upoadLintRes2Wiki.js",
     "lint": "eslint src",
     "getall": "node src/getall.js",
     "download": "node src/download.js",
