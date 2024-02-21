@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "wow": "node src/test.js",
     "test": "node src/upoadLintRes2Wiki.js",
     "lint": "eslint src",
     "getall": "node src/getall.js",
@@ -12,7 +13,9 @@
     "addlinttype": "node src/addLintType.js",
     "execlint": "node src/execLint.js",
     "table": "node src/table.js",
-    "all": "node src/getall.js && node src/download.js && node src/addLintType.js && node src/execLint.js"
+    "upoadLintRes2Wiki": "node src/upoadLintRes2Wiki.js",
+    "all": "node src/getall.js && node src/download.js && node src/addLintType.js && node src/execLint.js",
+    "all:upload": "node src/getall.js && node src/download.js && node src/addLintType.js && node src/execLint.js && node src/upoadLintRes2Wiki.js"
   },
   "author": "eyea <deyesea@gmail.com>",
   "license": "ISC",

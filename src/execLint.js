@@ -132,7 +132,8 @@ function summarizeErrorsAndWarnings(array) {
         codeLines: totalCodeLines,
         created_at: item.created_at || '',
         last_activity_at: item.last_activity_at || '',
-        id: item.id || ''
+        id: item.id || '',
+        name: item.name || '',
       },
     };
 
