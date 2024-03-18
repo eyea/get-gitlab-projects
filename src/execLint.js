@@ -19,7 +19,15 @@ async function loadFileList() {
 
 // 执行具体的lint 返回结果
 function runLint(lintType, lintPath) {
-  let lintresult = {};
+  let lintresult = {
+    errors: 0,
+    warnings: 0,
+    total: 0,
+    blankLines: 0,
+    commentLines: 0,
+    codeLines: 0,
+    complexityDataLength: 0,
+  };
 
   // 检查path是否存在
   if (!fs.existsSync(lintPath)) {
@@ -27,28 +35,31 @@ function runLint(lintType, lintPath) {
   }
 
   // 增加缓冲区大小到10MB
-// const options = { stdio: 'inherit', maxBuffer: 1024 * 1024 * 10 };
   const res = execSync(
     `npx @afuteam/eslint-plugin-fe@latest --type=${lintType} --path=${lintPath}`,
     { encoding: "utf8", maxBuffer: 1024 * 1024 * 10 }
   );
   console.log(res);
-  const errorsMatch = res.match(/Total errors:\s*(\d+)/);
-  const warningsMatch = res.match(/Total warnings:\s*(\d+)/);
+  const errorsMatch = res.match(/Total errors:\s*(\d+)/) || 0;
+  const warningsMatch = res.match(/Total warnings:\s*(\d+)/) || 0;
   const totalBlankLines = res.match(/Total totalBlankLines:\s*(\d+)/) || 0;
   const totalCommentLines = res.match(/Total totalCommentLines:\s*(\d+)/) || 0;
   const totalCodeLines = res.match(/Total totalCodeLines:\s*(\d+)/) || 0;
+  const complexityDataLength = res.match(/Total complexityDataLength:\s*(\d+)/) || 0;
 
-  if (errorsMatch && warningsMatch) {
-    lintresult = {
-      errors: +errorsMatch[1],
-      warnings: +warningsMatch[1],
-      total: +errorsMatch[1] + +warningsMatch[1],
-      blankLines: +totalBlankLines[1],
-      commentLines: +totalCommentLines[1],
-      codeLines: +totalCodeLines[1],
-    };
-  }
+    try {
+      lintresult = {
+        errors: +errorsMatch[1],
+        warnings: +warningsMatch[1],
+        total: +errorsMatch[1] + +warningsMatch[1],
+        blankLines: +totalBlankLines[1],
+        commentLines: +totalCommentLines[1],
+        codeLines: +totalCodeLines[1],
+        complexityDataLength: +complexityDataLength[1],
+      };
+    } catch (error) {
+      console.error('Failed to parse lint result:', error);
+    }
 
   return lintresult;
 }
@@ -66,6 +77,7 @@ function summarizeErrorsAndWarnings(array) {
     let totalBlankLines = 0;
     let totalCommentLines = 0;
     let totalCodeLines = 0;
+    let complexityDataLength = 0;
 
     // 递归函数，累加 errors 和 warnings
     function accumulateErrorsAndWarnings(info) {
@@ -93,6 +105,9 @@ function summarizeErrorsAndWarnings(array) {
               if (key === "codeLines") {
                 totalCodeLines += value1[key];
               }
+              if (key === 'complexityDataLength') {
+                complexityDataLength += value1[key];
+              }
               // 递归调用
               accumulateErrorsAndWarnings(value1[key]);
             });
@@ -113,6 +128,9 @@ function summarizeErrorsAndWarnings(array) {
             if (obj === "codeLines") {
               totalCodeLines += info[obj];
             }
+            if (obj === 'complexityDataLength') {
+              complexityDataLength += info[obj];
+            }
           }
         });
       }
@@ -130,6 +148,7 @@ function summarizeErrorsAndWarnings(array) {
         blankLines: totalBlankLines,
         commentLines: totalCommentLines,
         codeLines: totalCodeLines,
+        complexityDataLength: complexityDataLength,
         created_at: item.created_at || '',
         last_activity_at: item.last_activity_at || '',
         id: item.id || '',
